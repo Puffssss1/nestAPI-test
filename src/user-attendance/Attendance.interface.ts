@@ -3,4 +3,6 @@ export interface Attendance {
   email: string;
   timestamp: number;
   types: string;
+
+  [key: string]: any;
 }
