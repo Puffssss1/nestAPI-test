@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import SurrealDB from 'surrealdb.js';
 import { Attendance } from './Attendance.interface';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { v7 as uuidv7 } from 'uuid';
 
 @Injectable()
 export class AttendanceRepository {
@@ -32,10 +34,14 @@ export class AttendanceRepository {
 
   // Save a new attendance record
   async save(attendance: Attendance): Promise<Attendance> {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { v7: uuidv7 } = require('uuid');
     const attendanceToSave: Attendance = {
+      id: uuidv7(),
       ...attendance,
       timestamp: attendance.timestamp || Date.now(),
     };
+    console.log('Attendance ID:', attendanceToSave.id);
     const result = await this.client.create<Attendance>(
       this.table,
       attendanceToSave,
