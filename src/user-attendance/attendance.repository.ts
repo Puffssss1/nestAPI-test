@@ -32,8 +32,19 @@ export class AttendanceRepository {
 
   // Save a new attendance record
   async save(attendance: Attendance): Promise<Attendance> {
-    const result = await this.client.create<any>(this.table, attendance as any);
-    return result[0] as Attendance;
+    const attendanceToSave: Attendance = {
+      ...attendance,
+      timestamp: attendance.timestamp || Date.now(),
+    };
+    const result = await this.client.create<Attendance>(
+      this.table,
+      attendanceToSave,
+    );
+    const savedAttendance = result[0] as Attendance;
+    return {
+      ...savedAttendance,
+      timestamp: new Date(savedAttendance.timestamp).getTime(),
+    };
   }
 
   // Retrieve all attendance records
@@ -58,7 +69,7 @@ export class AttendanceRepository {
     return result as Attendance[];
   }
 
-  //Update the attendance
+  //Update the attendance *FOR FUTURE USE*
   async update(
     id: number,
     updatedData: Partial<Attendance>,
@@ -67,7 +78,7 @@ export class AttendanceRepository {
     return this.findById(id);
   }
 
-  // Delete an attendance record by ID
+  // Delete an attendance record by *FOR FUTURE USE*
   async delete(id: number): Promise<boolean> {
     try {
       const result = await this.client.delete<any>(`${this.table}:${id}`);
@@ -75,22 +86,6 @@ export class AttendanceRepository {
     } catch (error) {
       console.error('Error deleting record:', error);
       return false;
-    }
-  }
-
-  // Example of an advanced query
-  async getMarketingStatistics(): Promise<any> {
-    try {
-      const result = await this.client.query<any>(
-        'SELECT types, COUNT() FROM type::table($tb) GROUP BY types',
-        {
-          tb: this.table,
-        },
-      );
-      return result;
-    } catch (error) {
-      console.error('Error executing advanced query:', error);
-      return [];
     }
   }
 }
